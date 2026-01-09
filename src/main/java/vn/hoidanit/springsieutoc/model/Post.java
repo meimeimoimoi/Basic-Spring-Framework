@@ -11,63 +11,44 @@
 
 package vn.hoidanit.springsieutoc.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class Post {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id; // object generic<> id == null
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String title;
-	private String content;
-	private String createdAt;
-	private String updatedAt;
+    @NotBlank(message = "title không được để trống")
+    private String title;
 
-	public Long getId() {
-		return id;
-	}
+    @NotBlank(message = "content không được để trống")
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String content;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private Instant createdAt;
 
-	public String getTitle() {
-		return title;
-	}
+    private Instant updatedAt;
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    @OneToMany(mappedBy = "post")
+    List<Comment> comments;
 
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public String getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(String updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

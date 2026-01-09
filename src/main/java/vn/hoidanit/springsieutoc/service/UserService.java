@@ -14,6 +14,7 @@ package vn.hoidanit.springsieutoc.service;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -21,13 +22,11 @@ import vn.hoidanit.springsieutoc.model.User;
 import vn.hoidanit.springsieutoc.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
 	private final UserRepository userRepository;
 
-	public UserService(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
 
 	public List<User> fetchUsers() {
 		// Logic fetch user/kết nối DB thực tế sẽ ở đây
