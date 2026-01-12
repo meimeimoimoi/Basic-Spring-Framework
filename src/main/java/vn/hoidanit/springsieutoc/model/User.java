@@ -49,8 +49,8 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    List<Comment> comments;
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "user")
-    List<Post> posts;
+    private List<Post> posts;
 }

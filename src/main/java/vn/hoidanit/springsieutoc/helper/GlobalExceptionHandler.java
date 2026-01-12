@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.persistence.EntityNotFoundException;
+import vn.hoidanit.springsieutoc.helper.exception.ResourceAlreadyExistException;
+import vn.hoidanit.springsieutoc.helper.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,6 +21,11 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> handleNotFound(EntityNotFoundException ex) {
 		return ApiResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());
 	}
+
+    @ExceptionHandler({ResourceNotFoundException.class, ResourceAlreadyExistException.class})
+    public ResponseEntity<?> handleNotFound(Exception ex) {
+        return ApiResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
