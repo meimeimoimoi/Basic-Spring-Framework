@@ -12,13 +12,17 @@
 package vn.hoidanit.springsieutoc.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import vn.hoidanit.springsieutoc.helper.exception.ResourceAlreadyExistException;
+import vn.hoidanit.springsieutoc.model.DTO.UserResponseDTO;
+import vn.hoidanit.springsieutoc.model.Role;
 import vn.hoidanit.springsieutoc.model.User;
+import vn.hoidanit.springsieutoc.repository.RoleRepository;
 import vn.hoidanit.springsieutoc.repository.UserRepository;
 
 @Service
@@ -26,19 +30,32 @@ import vn.hoidanit.springsieutoc.repository.UserRepository;
 public class UserService {
 
 	private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder; // chi can goi interface
+    private final RoleRepository roleRepository;
 
 	public List<User> fetchUsers() {
 		// Logic fetch user/kết nối DB thực tế sẽ ở đây
-
 		List<User> userList = this.userRepository.findAll();
 		// select * from users
-
 		return userList;
 	}
 
-	public User createUser(User user) {
-		return this.userRepository.save(user);
+	public UserResponseDTO createUser(User user) {
+		//check mail
+        if(this.userRepository.existsByEmail(user.getEmail())){
+            throw new ResourceAlreadyExistException("Email: "+user.getEmail()+" already exists");
+        }
+        //check role
+        Long userId = user.getRole().getId();
+        String roleName = user.getRole().getName();
+        Role roleInDb = this.roleRepository.findByIdOrName(userId, roleName)
+                .orElseThrow(() -> new EntityNotFoundException("Role not exists."));
+
+        // hashpassword
+        String hashPassword = this.passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashPassword);
+        user.setRole(roleInDb);
+        return convertUserToDTO(this.userRepository.save(user));
 	}
 
 	public User findUserById(int id) {
@@ -62,5 +79,20 @@ public class UserService {
 		this.userRepository.deleteById(id);
 	}
 
+    public UserResponseDTO convertUserToDTO(User user){
+//        UserResponseDTO userResponseDTO = new UserResponseDTO();
+//
+//        userResponseDTO.setId(user.getId());
+//        userResponseDTO.setEmail(user.getEmail());
+//
+//        return userResponseDTO;
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .role(user.getRole())
+                .build();
+    }
 
 }
