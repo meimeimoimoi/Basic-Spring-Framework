@@ -12,6 +12,7 @@
 package vn.hoidanit.springsieutoc.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import vn.hoidanit.springsieutoc.helper.exception.ResourceAlreadyExistException;
+import vn.hoidanit.springsieutoc.helper.exception.ResourceNotFoundException;
+import vn.hoidanit.springsieutoc.model.DTO.RoleResponseDTO;
+import vn.hoidanit.springsieutoc.model.DTO.UserRequestDTO;
 import vn.hoidanit.springsieutoc.model.DTO.UserResponseDTO;
 import vn.hoidanit.springsieutoc.model.Role;
 import vn.hoidanit.springsieutoc.model.User;
@@ -33,9 +37,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder; // chi can goi interface
     private final RoleRepository roleRepository;
 
-	public List<User> fetchUsers() {
+	public List<UserResponseDTO> fetchUsers() {
 		// Logic fetch user/kết nối DB thực tế sẽ ở đây
-		List<User> userList = this.userRepository.findAll();
+		List<UserResponseDTO> userList =
+                this.userRepository.findAll().stream().map(
+                        user -> UserResponseDTO.builder()
+                                .id(user.getId())
+                                .name(user.getName())
+                                .email(user.getEmail())
+                                .address(user.getAddress())
+                                .role(new RoleResponseDTO(user.getRole().getId(), user.getRole().getName()))
+                        .build())
+                        .collect(Collectors.toList());
 		// select * from users
 		return userList;
 	}
@@ -58,21 +71,27 @@ public class UserService {
         return convertUserToDTO(this.userRepository.save(user));
 	}
 
-	public User findUserById(int id) {
-		return this.userRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("user not found with id = " + id));
+	public UserResponseDTO findUserById(int id) {
 
+		User userInDb = this.userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("user not found with id = " + id));
+
+        return convertUserToDTO(userInDb);
 	}
 
-	public void updateUser(User inputUser) {
-		User currentUserInDB = this.findUserById(inputUser.getId());
-		if (currentUserInDB != null) {
-			currentUserInDB.setName(inputUser.getName());
-			currentUserInDB.setEmail(inputUser.getEmail());
-			currentUserInDB.setAddress(inputUser.getAddress());
+	public void updateUser(int id, UserRequestDTO inputUser) {
+        User userInDb = this.userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found with id = " + id));
 
-			this.userRepository.save(currentUserInDB);
-		}
+        if(inputUser.getRole() != null){
+            //update role
+            userInDb.setRole(inputUser.getRole());
+        }
+
+        userInDb.setName(inputUser.getName());
+        userInDb.setAddress(inputUser.getAddress());
+
+        this.userRepository.save(userInDb);
 	}
 
 	public void deleteUserById(int id) {
@@ -80,18 +99,14 @@ public class UserService {
 	}
 
     public UserResponseDTO convertUserToDTO(User user){
-//        UserResponseDTO userResponseDTO = new UserResponseDTO();
-//
-//        userResponseDTO.setId(user.getId());
-//        userResponseDTO.setEmail(user.getEmail());
-//
-//        return userResponseDTO;
+        RoleResponseDTO userRole = new RoleResponseDTO(user.getRole().getId(), user.getRole().getName());
+
         return UserResponseDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .address(user.getAddress())
-                .role(user.getRole())
+                .role(userRole)
                 .build();
     }
 

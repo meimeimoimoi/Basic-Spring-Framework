@@ -44,7 +44,7 @@ public class User {
 	@NotBlank(message = "address không được để trống")
 	private String address;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 

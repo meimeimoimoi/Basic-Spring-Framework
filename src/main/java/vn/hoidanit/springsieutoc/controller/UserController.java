@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.springsieutoc.helper.ApiResponse;
+import vn.hoidanit.springsieutoc.model.DTO.UserRequestDTO;
 import vn.hoidanit.springsieutoc.model.DTO.UserResponseDTO;
 import vn.hoidanit.springsieutoc.model.User;
 import vn.hoidanit.springsieutoc.service.UserService;
@@ -44,21 +45,20 @@ public class UserController {
 	}
 
 	@GetMapping("/users")
-	public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
-		List<User> users = this.userService.fetchUsers();
+	public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers() {
+		List<UserResponseDTO> users = this.userService.fetchUsers();
 		return ApiResponse.success(users);
 	}
 
 	@GetMapping("/user/{id}")
-	public ResponseEntity<ApiResponse<User>> getUserByID(@PathVariable int id) {
-		User user = this.userService.findUserById(id);
+	public ResponseEntity<ApiResponse<UserResponseDTO>> getUserByID(@PathVariable int id) {
+		UserResponseDTO user = this.userService.findUserById(id);
 		return ApiResponse.success(user);
 	}
 
 	@PutMapping("/user/{id}")
-	public ResponseEntity<ApiResponse<String>> updateUserById(@PathVariable int id, @RequestBody User inputUser) {
-		inputUser.setId(id);
-		this.userService.updateUser(inputUser);
+	public ResponseEntity<ApiResponse<String>> updateUserById(@PathVariable int id, @RequestBody UserRequestDTO inputUser) {
+		this.userService.updateUser(id, inputUser);
 		return ApiResponse.success("Update success.");
 	}
     // push

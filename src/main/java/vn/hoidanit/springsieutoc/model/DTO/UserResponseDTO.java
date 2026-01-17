@@ -22,9 +22,6 @@ public class UserResponseDTO {
 
     private String address;
 
-    private Role role;
+    private RoleResponseDTO role;
 
-    private List<Comment> comments;
-
-    private List<Post> posts;
 }
