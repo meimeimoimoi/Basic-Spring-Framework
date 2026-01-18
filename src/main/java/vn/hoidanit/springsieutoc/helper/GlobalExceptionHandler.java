@@ -17,6 +17,13 @@ import vn.hoidanit.springsieutoc.helper.exception.ResourceNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleAllException(Exception ex) {
+        System.out.println(ex);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<?> handleNotFound(EntityNotFoundException ex) {
 		return ApiResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());

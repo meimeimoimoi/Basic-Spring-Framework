@@ -14,13 +14,7 @@ package vn.hoidanit.springsieutoc.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.springsieutoc.helper.ApiResponse;
@@ -45,8 +39,14 @@ public class UserController {
 	}
 
 	@GetMapping("/users")
-	public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers() {
-		List<UserResponseDTO> users = this.userService.fetchUsers();
+	public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers(
+            @RequestParam (required = false) String role) {
+		List<UserResponseDTO> users = null;
+        if(role != null)
+            users = this.userService.fecthUserWithRole(role);
+        else
+            users = this.userService.fetchUsers();
+
 		return ApiResponse.success(users);
 	}
 

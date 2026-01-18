@@ -53,6 +53,17 @@ public class UserService {
 		return userList;
 	}
 
+    public List<UserResponseDTO> fecthUserWithRole(String roleName){
+        List<UserResponseDTO> userList = this.userRepository.findByRole_Name(roleName).stream()
+                .map(user -> UserResponseDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .address(user.getAddress())
+                        .role(new RoleResponseDTO(user.getRole().getId(), user.getRole().getName())).build())
+                .collect(Collectors.toList());
+        return userList;
+    }
+
 	public UserResponseDTO createUser(User user) {
 		//check mail
         if(this.userRepository.existsByEmail(user.getEmail())){
