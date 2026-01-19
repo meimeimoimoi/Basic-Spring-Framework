@@ -1,5 +1,8 @@
 package vn.hoidanit.springsieutoc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,5 +27,6 @@ public class Tag {
     private String name;
 
     @ManyToMany
+    @JsonIgnoreProperties(value = {"tags", "users", "comments"})
     private List<Post> posts;
 }

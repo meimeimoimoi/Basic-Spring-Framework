@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.hoidanit.springsieutoc.helper.exception.ResourceAlreadyExistException;
 import vn.hoidanit.springsieutoc.helper.exception.ResourceNotFoundException;
+import vn.hoidanit.springsieutoc.model.Post;
 import vn.hoidanit.springsieutoc.model.Tag;
+import vn.hoidanit.springsieutoc.repository.PostRepository;
 import vn.hoidanit.springsieutoc.repository.TagRepository;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
+    private final PostRepository postRepository;
 
     public Tag Create(Tag tag){
         if(this.tagRepository.existsByName(tag.getName())){
@@ -42,6 +45,18 @@ public class TagService {
     }
 
     public void deleteTag(Long id){
+
+        Tag tagToDelete = this.tagRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag không tồn tại"));
+
+        // lay post thong qua tag
+        List<Post> postToUpdate = this.postRepository.findByTagsContains(tagToDelete);
+        for (Post post : postToUpdate){
+            post.getTags().remove(tagToDelete);
+
+            this.postRepository.save(post);
+        }
+
         this.tagRepository.deleteById(id);
     }
 
