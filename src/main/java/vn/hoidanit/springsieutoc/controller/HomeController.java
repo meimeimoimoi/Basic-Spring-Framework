@@ -11,29 +11,30 @@
 
 package vn.hoidanit.springsieutoc.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.hoidanit.springsieutoc.config.JwtConfig;
+import vn.hoidanit.springsieutoc.helper.ApiResponse;
 import vn.hoidanit.springsieutoc.service.UserService;
 
 @RestController
+@RequiredArgsConstructor
 public class HomeController {
 
 	private final UserService userService;
-
-	public HomeController(UserService userService) {
-		this.userService = userService;
-	}
+	private final JwtConfig jwtConfig;
 
 	@Value("${hoidanit.secret:default-value}")
 	private String name;
 
 	@GetMapping("/")
-	public String index() {
-		return "Hello World from Spring Boot - @hoidanit devtool: " + name;
+	public ResponseEntity<?> index() {
+		return ApiResponse.success(this.jwtConfig.createAccessToken());
 	}
 
 	@GetMapping("/hoidanit/1")
