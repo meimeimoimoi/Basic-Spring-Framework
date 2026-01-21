@@ -121,4 +121,8 @@ public class UserService {
                 .build();
     }
 
+    public User findUserByEmail(String email){
+        return this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tìm thấy."));
+    }
 }

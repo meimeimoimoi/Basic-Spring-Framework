@@ -6,10 +6,13 @@ import com.nimbusds.jose.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import vn.hoidanit.springsieutoc.service.UserService;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,6 +26,19 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    UserDetailsService userDetailsService(UserService userServiCe) {
+        return new CustomUserDetailService(userServiCe);
+    }
+
+    @Bean
+    DaoAuthenticationProvider daoAuthenticationProvider(UserDetailsService userDetailsService,
+                                                        PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider(userDetailsService);
+        daoProvider.setPasswordEncoder(passwordEncoder);
+        return daoProvider;
     }
 
     @Bean

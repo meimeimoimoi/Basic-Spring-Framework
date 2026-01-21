@@ -53,4 +53,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
+
+	public <T> User(
+			@NotBlank(message = "email không được để trống") String email,
+			@NotBlank(message = "password không được để trống") String password, List<T> ts) {
+	}
 }

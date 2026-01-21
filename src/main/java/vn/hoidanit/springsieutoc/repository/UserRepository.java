@@ -23,6 +23,8 @@ import vn.hoidanit.springsieutoc.model.User;
 public interface UserRepository extends JpaRepository<User, Integer> {
 	Optional<User> findByName(String name);
 
+    Optional<User> findByEmail(String email);
+
 	Optional<User> findByNameAndEmail(String name, String email);
 
     List<User> findByRole_Name(String roleName);
