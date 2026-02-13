@@ -58,4 +58,7 @@ public class User {
 			@NotBlank(message = "email không được để trống") String email,
 			@NotBlank(message = "password không được để trống") String password, List<T> ts) {
 	}
+
+	@OneToMany(mappedBy = "user")
+	private List<RefreshToken> refreshTokens;
 }

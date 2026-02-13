@@ -1,4 +1,5 @@
 package vn.hoidanit.springsieutoc.model.DTO;
+import vn.hoidanit.springsieutoc.model.DTO.LoginResponseDTO.UserLogin;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDTO {
+public class ExchangeTokenResponse {
     private String accessToken;
 
     private String refreshToken;
@@ -17,14 +18,4 @@ public class LoginResponseDTO {
     private String tokenType = "Bearer";
 
     private UserLogin user;
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserLogin {
-        private int id;
-        private String username;
-        private String role;
-    }
 }

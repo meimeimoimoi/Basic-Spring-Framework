@@ -59,7 +59,9 @@ public class UserService {
                         .id(user.getId())
                         .email(user.getEmail())
                         .address(user.getAddress())
-                        .role(new RoleResponseDTO(user.getRole().getId(), user.getRole().getName())).build())
+                        .role(new RoleResponseDTO(user.getRole().getId(),
+                                user.getRole().getName()))
+                        .build())
                 .collect(Collectors.toList());
         return userList;
     }

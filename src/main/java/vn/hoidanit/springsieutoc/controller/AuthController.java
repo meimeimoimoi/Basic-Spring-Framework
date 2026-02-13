@@ -13,22 +13,21 @@ package vn.hoidanit.springsieutoc.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.hoidanit.springsieutoc.config.JwtConfig;
+import vn.hoidanit.springsieutoc.config.JwtService;
 import vn.hoidanit.springsieutoc.helper.ApiResponse;
+import vn.hoidanit.springsieutoc.model.DTO.ExchangeTokenResponse;
 import vn.hoidanit.springsieutoc.model.DTO.LoginRequestDTO;
 import vn.hoidanit.springsieutoc.model.DTO.LoginResponseDTO;
+import vn.hoidanit.springsieutoc.model.User;
 import vn.hoidanit.springsieutoc.service.UserService;
 
 @RestController
@@ -36,11 +35,9 @@ import vn.hoidanit.springsieutoc.service.UserService;
 public class AuthController {
 
 	private final UserService userService;
-	private final JwtConfig jwtConfig;
-	private final DaoAuthenticationProvider authenticationManager;
+	private final JwtService jwtService;
+	private final AuthenticationManager authenticationManager;
 
-	@Value("${hoidanit.secret:default-value}")
-	private String name;
 
 	@PostMapping("/auth/login")
 	public ResponseEntity<?> postLogin(@Valid @RequestBody LoginRequestDTO dto) {
@@ -49,20 +46,27 @@ public class AuthController {
 
 		Authentication authentication = authenticationManager.authenticate(authToken);
 
-		String accessToken = this.jwtConfig.createAccessToken(authentication);
+		User currentUser = this.userService.findUserByEmail(authentication.getName());
+
+		String accessToken = this.jwtService.createAccessToken(authentication, currentUser.getId());
+
+		String refreshToken = this.jwtService.createRefreshToken(currentUser);
 
 		LoginResponseDTO res = new LoginResponseDTO(); // tạo để gửi ra phản hồi
 		res.setAccessToken(accessToken);
 		res.setUser(new LoginResponseDTO.UserLogin(
-				authentication.getName(), "Sai"
+				currentUser.getId(),
+				authentication.getName(),
+				this.jwtService.getScope(authentication)
 		));
 
+		res.setRefreshToken(refreshToken);
 		return ApiResponse.success(res);
 	}
 
-	@GetMapping("/hoidanit/1")
-	public ResponseEntity<String> demoAPI() {
-//		return new ResponseEntity<String>("Hello Vuong", HttpStatus.CREATED);
-		return ResponseEntity.status(HttpStatus.CREATED).body("Hello update");
+	@PostMapping("/auth/refresh")
+	public ResponseEntity<?> postRefreshToken(@RequestParam("token") String refreshToken){
+		ExchangeTokenResponse res = this.jwtService.hanldeExchangeToken(refreshToken);
+		return ApiResponse.success(res);
 	}
 }
