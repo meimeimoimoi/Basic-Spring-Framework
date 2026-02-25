@@ -91,7 +91,7 @@ public class SecurityConfig {
                                             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception{
 
         http.authorizeHttpRequests((requests) ->
-                requests.requestMatchers("/auth/login", "/auth/refresh").permitAll()
+                requests.requestMatchers("/auth/login", "/auth/refresh", "/auth/refresh-cookie").permitAll()
                 .requestMatchers("/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
